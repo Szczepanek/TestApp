@@ -1,0 +1,53 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+    int length = 20;
+}
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<div>
+    <div id="textBoxes">
+        <textarea id="generatedNumbers" rows="@length"></textarea>
+        <textarea id="transferedNumbers" rows="@length"></textarea>
+    </div>
+    <div>
+        <button id="btnInit" class="btn btn-primary">Initialize</button>
+        <button id="btnTransfer" class="btn btn-primary">Transfer</button>
+        <button id="btnCancel" class="btn btn-primary">Cancel</button>
+        <button id="btnReset" class="btn btn-primary">Restart</button>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        var genNumArray = [];
+        var transNumArray = [];
+        var intervalId;
+        $("#btnInit").click(function () {
+            $.get("/Home/Initialize",{arrayLength: @length},
+                function (response) {
+                    $("#generatedNumbers").val(response.join("\n"));
+                    genNumArray = response;
+                }
+             );
+        });
+        $("#btnTransfer").click(function () {
+            intervalId = setInterval(transfer, 500);
+        });
+        $("#btnCancel").click(function () {
+            clearInterval(intervalId);
+        });
+        $("#btnReset").click(function () {
+            $("#transferedNumbers").val(null);
+            $("#btnInit").trigger("click");
+
+        });
+        const transfer =()=>{
+            console.log(genNumArray);
+                        $.post("/Home/Transfer",{generatedNumbers: genNumArray},
+                    function (response) {
+                        $("#transferedNumbers").val(response.join("\n"));
+                    }
+                 );
+        }
+    });
+</script>
